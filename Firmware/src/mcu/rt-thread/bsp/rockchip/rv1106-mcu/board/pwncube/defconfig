@@ -1,0 +1,105 @@
+#
+# CubeSat flight-computer MCU config (RV1106 RISC-V / RT-Thread).
+# Minimal: core RTOS + console UART + I2C + clocks. No camera/ISP/PWM/ADC.
+#
+CONFIG_SOC_RV1106=y
+CONFIG_BOARD_RV1106_RISCV_EVB=y
+
+#
+# RT-Thread Kernel
+#
+CONFIG_RT_USING_CORE_RTTHREAD=y
+CONFIG_RT_NAME_MAX=8
+CONFIG_RT_ALIGN_SIZE=4
+CONFIG_RT_THREAD_PRIORITY_32=y
+CONFIG_RT_THREAD_PRIORITY_MAX=32
+CONFIG_RT_TICK_PER_SECOND=1000
+CONFIG_RT_USING_OVERFLOW_CHECK=y
+CONFIG_RT_USING_HOOK=y
+CONFIG_RT_USING_IDLE_HOOK=y
+CONFIG_RT_IDEL_HOOK_LIST_SIZE=4
+CONFIG_IDLE_THREAD_STACK_SIZE=1024
+
+#
+# Inter-Thread communication
+#
+CONFIG_RT_USING_SEMAPHORE=y
+CONFIG_RT_USING_MUTEX=y
+CONFIG_RT_USING_EVENT=y
+CONFIG_RT_USING_MAILBOX=y
+CONFIG_RT_USING_MESSAGEQUEUE=y
+
+#
+# Memory Management
+#
+CONFIG_RT_USING_MEMPOOL=y
+CONFIG_RT_USING_SMALL_MEM=y
+CONFIG_RT_USING_HEAP=y
+
+#
+# Kernel Device Object
+#
+CONFIG_RT_USING_DEVICE=y
+# Console disabled: Linux owns uart2 (ttyFIQ0). MCU is verified over RPMsg.
+# CONFIG_RT_USING_CONSOLE is not set
+CONFIG_RT_VER_NUM=0x30103
+CONFIG_ARCH_RISCV=y
+
+#
+# RT-Thread Components
+#
+CONFIG_RT_USING_COMPONENTS_INIT=y
+
+#
+# Device Drivers
+#
+CONFIG_RT_USING_DEVICE_IPC=y
+CONFIG_RT_PIPE_BUFSZ=512
+CONFIG_RT_USING_I2C=y
+CONFIG_RT_USING_PIN=y
+
+#
+# C standard library
+#
+CONFIG_RT_USING_LIBC=y
+
+#
+# RT-Thread board config
+#
+CONFIG_RT_BOARD_NAME="pwncube"
+
+#
+# RT-Thread rockchip common drivers
+#
+# CubeSat: SCR1 DCACHE ctrl (0xff640000) init hangs in our boot flow (SystemInit
+# poll never finishes); run uncached until the hpmcu_wrap-style cache dance is
+# ported. See SystemInit in system_rv1106.c.
+# CONFIG_RT_USING_CACHE is not set
+
+#
+# RT-Thread rockchip rv1106 drivers
+#
+CONFIG_RT_USING_CRU=y
+
+#
+# Enable I2C
+#
+CONFIG_RT_USING_I2C4=y
+
+#
+# UART0 (Etapa 5, real GPS/NEO-6M): deliberately NOT enabled here.
+# CONFIG_RT_USING_UART=y would also pull common/drivers/drv_uart.c into
+# the build, which needs RT-Thread's serial component (rt_serial_t,
+# RT_SERIAL_CONFIG_DEFAULT, rt_hw_serial_register -- not wired into this
+# BSP) -- unlike I2C's split (drv_i2c.c has no such extra dependency),
+# UART's driver-level flag and its HAL module flag are NOT independent
+# here. gps_nmea.c drives UART0 with bare HAL_UART_* calls instead
+# (hal_conf.h force-enables HAL_UART_MODULE_ENABLED directly, same
+# unconditional pattern already used there for HAL_SPI_MODULE_ENABLED).
+# Linux still owns uart2 (ttyFIQ0 console).
+#
+
+#
+# A7<->RISC-V RPMsg transport (Paso 0)
+#
+CONFIG_RT_USING_RPMSG_LITE=y

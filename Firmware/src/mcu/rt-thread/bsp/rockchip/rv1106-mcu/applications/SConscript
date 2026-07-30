@@ -1,0 +1,26 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+cwd     = os.path.join(str(Dir('#')), 'applications')
+src     = Glob('*.c')
+src    += Glob('ccsds/*.c')
+CPPPATH = [cwd, os.path.join(cwd, 'ccsds'), str(Dir('#'))]
+
+group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
+
+# Ported U-Boot DWC3 gadget stack — built as its own group so only these files
+# see the U-Boot compat shim (force-included) and its private include tree, and
+# so their (third-party) warnings don't fail our -Werror app build.
+dwc3_cwd  = os.path.join(cwd, 'dwc3')
+dwc3_inc  = os.path.join(dwc3_cwd, 'inc')
+dwc3_src  = Glob('dwc3/*.c')
+dwc3_flags = (' -include ' + os.path.join(dwc3_inc, 'dwc3_port.h') +
+              ' -w -Wno-error -Wno-implicit-function-declaration -fno-builtin')
+dwc3_group = DefineGroup('dwc3', dwc3_src, depend = [''],
+                         LOCAL_CPPPATH = [dwc3_inc, dwc3_cwd],
+                         LOCAL_CCFLAGS = dwc3_flags)
+
+for o in dwc3_group:
+    group.append(o)
+Return('group')

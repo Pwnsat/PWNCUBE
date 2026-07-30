@@ -1,0 +1,5 @@
+::sysinit:/etc/init.d/rcS
+::respawn:-/bin/sh
+ttyGS0::respawn:-/usr/bin/pwnsat_console
+::ctrlaltdel:/sbin/reboot
+::shutdown:/etc/init.d/rcK

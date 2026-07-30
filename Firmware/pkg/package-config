@@ -1,0 +1,23 @@
+RV1106 Package Configuration
+Uncomment lines below to enable packages.
+Then run: ./pkg/pkg.sh build-all && ./pkg/pkg.sh install-all
+
+PKG_ENABLE_hello-world=y
+# sx1262 (kmod+CLI viejo) RETIRADO: la radio la posee el MCU RISC-V; el codigo
+# fuente queda en src/sx1262-kmod (sx1262_cmd.c es compartido con el firmware).
+# PKG_ENABLE_sx1262=y
+PKG_ENABLE_radio-client=y
+PKG_ENABLE_telemetry-client=y
+# icm42670 (kmod) RETIRADO: los sensores I2C0 los posee el MCU RISC-V
+# (SensorService). El codigo fuente queda en src/icm42670-kmod como referencia
+# del mapa de registros (portado a applications/icm42670.c en el firmware).
+# PKG_ENABLE_icm42670=y
+PKG_ENABLE_sensor-client=y
+# mcu-tool (mcutool): hot-load/reset/release the RISC-V MCU from Linux via
+# /dev/mem. Dev aid to iterate MCU firmware without a full reflash. Needs
+# CONFIG_DEVMEM=y in the kernel.
+PKG_ENABLE_mcu-tool=y
+# pwnsat-console: "Black Hat Arsenal Edition" banner/menu on ttyGS0, replaces
+# the raw debug shell (see rootfs/skeleton/etc/inittab). Menu option 3 drops
+# to a real /bin/sh.
+PKG_ENABLE_pwnsat-console=y

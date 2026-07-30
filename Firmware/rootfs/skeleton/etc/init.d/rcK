@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Shutdown: unmount all filesystems
+/bin/umount -a -r

@@ -1,0 +1,116 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2022 Rockchip Electronics Co., Ltd.
+ */
+
+/dts-v1/;
+
+#include "rv1106.dtsi"
+#include "rv1106-evb.dtsi"
+#include "rv1106-sdk-ipc.dtsi"
+
+/ {
+	model = "RV1106 SDK Board";
+	compatible = "rockchip,rv1103g-38x38-ipc-v10", "rockchip,rv1106g3";
+
+	/* Explicit memory node, Luckfox thunder-boot style (theirs lives in
+	 * rv1106-thunder-boot.dtsi). Without it the kernel depends entirely on
+	 * the U-Boot memory fixup; if that doesn't land, memblock comes up
+	 * empty and paging_init panics on the first early_alloc. U-Boot still
+	 * fixes up the real size at boot. */
+	memory {
+		device_type = "memory";
+		reg = <0x00000000 0x10000000>;
+	};
+
+	chosen {
+		bootargs = "earlyprintk earlycon=uart8250,mmio32,0xff4c0000 console=ttyFIQ0 clk_ignore_unused";
+	};
+};
+
+/**********CRU**********/
+//&cru {
+//	assigned-clocks =
+//		<&cru PLL_GPLL>, <&cru PLL_CPLL>,
+//		<&cru ARMCLK>,
+//		<&cru ACLK_PERI_ROOT>, <&cru HCLK_PERI_ROOT>,
+//		<&cru PCLK_PERI_ROOT>, <&cru ACLK_BUS_ROOT>,
+//		<&cru PCLK_TOP_ROOT>, <&cru PCLK_PMU_ROOT>,
+//		<&cru HCLK_PMU_ROOT>, <&cru CLK_500M_SRC>;
+//	assigned-clock-rates =
+//		<1188000000>, <700000000>,
+//		<1104000000>,
+//		<400000000>, <200000000>,
+//		<100000000>, <300000000>,
+//		<100000000>, <100000000>,
+//		<200000000>, <700000000>;
+//};
+
+/**********NPU**********/
+//&npu {
+//	assigned-clock-rates = <700000000>;
+//};
+
+/**********FLASH**********/
+&sfc {
+	status = "okay";
+	flash@0 {
+		compatible = "spi-nand";
+		reg = <0>;
+		spi-max-frequency = <75000000>;
+		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
+	};
+};
+
+/**********SDMMC (disabled - SPI NAND only)**********/
+&sdmmc {
+	status = "disabled";
+};
+
+/**********ETH**********/
+&gmac {
+	status = "okay";
+};
+
+/**********USB**********/
+&u2phy {
+	status = "okay";
+};
+
+&u2phy_otg {
+	rockchip,dis-u2-susphy;
+	status = "okay";
+};
+
+&usbdrd {
+	status = "okay";
+};
+
+&usbdrd_dwc3 {
+	status = "okay";
+	dr_mode = "peripheral";
+};
+
+/* SX1262 radios (spi0/spi1 enable + conflicting-peripheral disables) live in
+ * rv1106-sdk-ipc.dtsi, next to the sx1262@0 nodes. */
+
+/**********I2C**********/
+/* I2C3_M1 */
+&i2c3 {
+	status = "disabled";
+	clock-frequency = <100000>;
+};
+
+/* I2C1_M1 */
+&i2c1 {
+	status = "disabled";
+	clock-frequency = <100000>;
+};
+
+
+
+/**********RTC**********/
+&rtc {
+	status = "okay";
+};
