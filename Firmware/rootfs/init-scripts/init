@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# devtmpfs does not get automounted for initramfs
+/bin/mount -t devtmpfs devtmpfs /dev
+
+exec /sbin/init

@@ -1,0 +1,32 @@
+output/
+# Everything under src/ ships in this public repo (kernel, u-boot, busybox,
+# mcu BSP, our own CLI clients, pwnsat-console, ...) except the compiled
+# client binaries below (the .c sources are the source of truth) and build
+# artifacts (kernel/ and u-boot/ carry their own upstream .gitignore for
+# theirs; the MCU ones are listed explicitly further down).
+src/radio-client/radio_test
+src/sensor-client/sensor_test
+src/telemetry-client/telemetry_test
+src/mcu-tool/mcutool
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+docs/.lang
+# RISC-V MCU (RT-Thread) build artifacts — never commit these
+src/mcu/**/build/
+src/mcu/**/rtthread.elf
+src/mcu/**/rtthread.bin
+src/mcu/**/rtthread.map
+src/mcu/**/.config
+src/mcu/**/rtconfig.h
+src/mcu/**/*.o
+src/mcu/**/*.i
+src/mcu/**/*.s
+src/mcu/**/auto_version.h
+# Shared SX1262 core is synced into applications/ by scripts/06-build-mcu.sh from
+# src/sx1262-kmod (the single source of truth); don't commit the copies.
+src/mcu/**/applications/sx1262_cmd.c
+src/mcu/**/applications/sx1262_regs.h

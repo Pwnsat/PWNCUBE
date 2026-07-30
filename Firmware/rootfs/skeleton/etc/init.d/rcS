@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# Mount filesystems
+/bin/mount -t proc proc /proc
+/bin/mount -t sysfs sysfs /sys
+/bin/mount -t tmpfs tmpfs /tmp
+/bin/mount -t tmpfs tmpfs /var
+
+# Start mdev (dynamic device manager)
+/sbin/mdev -s
+
+# Set hostname
+/bin/hostname -F /etc/hostname
+
+# SX1262: the radio hardware is now owned by the RISC-V MCU (RadioService over
+# rpmsg — docs/migration/design/40-migration-design.md). The old sx1262.ko is obsolete (its SPI DT
+# nodes are disabled). Bind the MCU's "rpmsg-radio" channel to rpmsg_chrdev so
+# userspace can drive the radio via /dev/rpmsg (radio_test).
+# Bind MCU rpmsg service channels to rpmsg_chrdev so userspace can reach them:
+# RadioService  (0x4005=16389, virtio0.rpmsg-radio.-1.16389     -> /dev/rpmsg0, radio_test)
+# SensorService (0x4006=16390, virtio0.rpmsg-sensor.-1.16390    -> /dev/rpmsg1, sensor_test)
+# TelemetryService (0x4007=16391, virtio0.rpmsg-telemetry.-1.16391 -> /dev/rpmsg2, telemetry_test)
+bind_rpmsg() {
+    ch="$1"
+    for i in 1 2 3 4 5; do
+        [ -e /sys/bus/rpmsg/devices/${ch} ] && break
+        sleep 1
+    done
+    if [ -e /sys/bus/rpmsg/devices/${ch} ]; then
+        echo rpmsg_chrdev > /sys/bus/rpmsg/devices/${ch}/driver_override
+        echo ${ch} > /sys/bus/rpmsg/drivers/rpmsg_chrdev/bind
+    fi
+}
+bind_rpmsg virtio0.rpmsg-radio.-1.16389
+bind_rpmsg virtio0.rpmsg-sensor.-1.16390
+bind_rpmsg virtio0.rpmsg-telemetry.-1.16391
+bind_rpmsg virtio0.rpmsg-command.-1.16392
+
+# USB gadget (generic serial bulk in/out) on the same DWC3 port used for
+# maskrom/flashing. dr_mode="peripheral" in dts/rv1106g-sdk.dts. The kernel
+# has CONFIG_USB_CONFIGFS_SERIAL=y, which selects USB_F_SERIAL ("gser"), NOT
+# USB_F_ACM ("acm") -- CONFIG_USB_F_ACM is not enabled in this defconfig, so
+# a functions/acm.* dir silently fails to instantiate. Use gser.usb0.
+# The MCU only takes this port over if something explicitly hands it off
+# (docs/usb-host-mcu.md, mcutool execute + devmem cmd=5), which does not
+# happen on a normal boot. This gives a login shell over USB with no
+# Ethernet/UART needed.
+G=/sys/kernel/config/usb_gadget/g1
+mount -t configfs configfs /sys/kernel/config 2>/dev/null
+mkdir -p "$G"
+echo 0x2207 > "$G/idVendor"
+echo 0x0011 > "$G/idProduct"
+echo 0x0100 > "$G/bcdDevice"
+echo 0x0200 > "$G/bcdUSB"
+mkdir -p "$G/strings/0x409"
+echo "PWNSAT-C3-0001" > "$G/strings/0x409/serialnumber"
+echo "PWNSAT" > "$G/strings/0x409/manufacturer"
+echo "PWNCUBE debug console" > "$G/strings/0x409/product"
+mkdir -p "$G/configs/c.1/strings/0x409"
+echo "debug console" > "$G/configs/c.1/strings/0x409/configuration"
+echo 120 > "$G/configs/c.1/MaxPower"
+mkdir -p "$G/functions/gser.usb0"
+ln -s "$G/functions/gser.usb0" "$G/configs/c.1/" 2>/dev/null
+UDC=""
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    UDC=$(ls /sys/class/udc 2>/dev/null | head -1)
+    [ -n "$UDC" ] && break
+    sleep 1
+done
+[ -n "$UDC" ] && echo "$UDC" > "$G/UDC"

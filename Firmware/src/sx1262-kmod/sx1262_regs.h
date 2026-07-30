@@ -1,0 +1,129 @@
+#ifndef __SX1262_REGS_H
+#define __SX1262_REGS_H
+
+/* Commands */
+#define SX1262_CMD_NOP                0x00
+#define SX1262_CMD_SET_SLEEP          0x84
+#define SX1262_CMD_SET_STANDBY        0x80
+#define SX1262_CMD_SET_FS             0xC1
+#define SX1262_CMD_SET_TX             0x83
+#define SX1262_CMD_SET_RX             0x82
+#define SX1262_CMD_STOP_TIMER_ON_PREAMBLE 0x9F
+#define SX1262_CMD_SET_RX_DUTY_CYCLE  0x94
+#define SX1262_CMD_SET_CAD            0xC5
+#define SX1262_CMD_SET_TX_CONTINUOUS  0xD1
+#define SX1262_CMD_SET_PACKET_TYPE    0x8A
+#define SX1262_CMD_GET_PACKET_TYPE    0x11
+#define SX1262_CMD_SET_RF_FREQUENCY   0x86
+#define SX1262_CMD_SET_PA_CONFIG      0x95
+#define SX1262_CMD_SET_TX_PARAMS      0x8E
+#define SX1262_CMD_SET_MODULATION_PARAMS 0x8B
+#define SX1262_CMD_SET_PACKET_PARAMS  0x8C
+#define SX1262_CMD_SET_DIO_IRQ_PARAMS 0x08
+#define SX1262_CMD_GET_IRQ_STATUS     0x12
+#define SX1262_CMD_CLR_IRQ_STATUS     0x02
+#define SX1262_CMD_SET_REGULATOR_MODE 0x96
+#define SX1262_CMD_CALIBRATE          0x89
+#define SX1262_CMD_CALIBRATE_IMAGE    0x98
+#define SX1262_CMD_SET_SAVE_CONTEXT   0xD5
+#define SX1262_CMD_SET_DIO3_AS_TCXO_CTRL 0x97
+#define SX1262_CMD_SET_DIO2_AS_RF_SWITCH 0x9D
+#define SX1262_CMD_SET_RX_TX_FALLBACK_MODE 0x93
+#define SX1262_CMD_GET_STATUS         0xC0
+#define SX1262_CMD_GET_RSSI_INST      0x15
+#define SX1262_CMD_GET_RX_BUFFER_STATUS 0x13
+#define SX1262_CMD_GET_PKT_STATUS     0x14   /* packet RSSI/SNR live here */
+#define SX1262_CMD_GET_DEVICE_ERRORS  0x17
+#define SX1262_CMD_CLEAR_DEV_ERRORS   0x07
+#define SX1262_CMD_GET_DEV_ERRORS     0x17
+#define SX1262_CMD_CLR_DEV_ERRORS     0x07
+#define SX1262_CMD_GET_STATS          0x10
+#define SX1262_CMD_RESET_STATS        0x00
+#define SX1262_CMD_READ_BUFFER        0x1E
+#define SX1262_CMD_WRITE_BUFFER       0x0E
+#define SX1262_CMD_READ_REGISTER      0x1D
+#define SX1262_CMD_WRITE_REGISTER     0x0D
+
+/* Register addresses */
+#define SX1262_REG_OCP_CONFIGURATION  0x08E7
+#define SX1262_REG_LORA_SYNCWORD      0x0740
+#define SX1262_REG_RX_TX_TIMEOUT      0x08F8
+#define SX1262_REG_TCXO_DELAY         0x0942
+#define SX1262_REG_PLL_LOCK_TIMEOUT   0x0944
+#define SX1262_REG_RTC_CONTROL        0x0900
+#define SX1262_REG_XTA_TRIM           0x0911
+#define SX1262_REG_XTB_TRIM           0x0912
+#define SX1262_REG_IMAGE_CAL_PHASE    0x095C
+#define SX1262_REG_ADV_MOD_CONFIG     0x08F9
+#define SX1262_REG_IO_POLARITY        0x0920
+#define SX1262_REG_IRQ_ENABLE        0x01D4
+#define SX1262_REG_IRQ_ENABLE_H       0x01D4
+#define SX1262_REG_IRQ_ENABLE_L       0x01D5
+#define SX1262_REG_DIO1_ENABLE_H      0x01D6
+#define SX1262_REG_DIO1_ENABLE_L      0x01D7
+#define SX1262_REG_DIO2_ENABLE_H      0x01D8
+#define SX1262_REG_DIO2_ENABLE_L      0x01D9
+#define SX1262_REG_DIO3_ENABLE_H      0x01DA
+#define SX1262_REG_DIO3_ENABLE_L      0x01DB
+
+/* Packet types */
+#define SX1262_PKT_TYPE_GFSK    0x00
+#define SX1262_PKT_TYPE_LORA    0x01
+
+/* Standby modes */
+#define SX1262_STANDBY_RC    0x00
+#define SX1262_STANDBY_XOSC  0x01
+
+/* Sleep modes */
+#define SX1262_SLEEP_RTC         0x00
+#define SX1262_SLEEP_OFF         0x04
+
+/* Buffer base addresses */
+#define SX1262_CMD_SET_BUFFER_BASE_ADDRESS 0x8F
+
+/* IRQ masks (SX1262 datasheet, IRQ status register bit positions) */
+#define SX1262_IRQ_TX_DONE           0x0001
+#define SX1262_IRQ_RX_DONE           0x0002
+#define SX1262_IRQ_PREAMBLE_DETECTED 0x0004
+#define SX1262_IRQ_SYNCWORD_VALID    0x0008
+#define SX1262_IRQ_HEADER_VALID      0x0010
+#define SX1262_IRQ_HEADER_ERR        0x0020
+#define SX1262_IRQ_CRC_ERR           0x0040
+#define SX1262_IRQ_CAD_DONE          0x0080
+#define SX1262_IRQ_CAD_DETECTED      0x0100
+#define SX1262_IRQ_TIMEOUT           0x0200
+#define SX1262_IRQ_ALL               0xFFFF
+
+/* Status bits */
+#define SX1262_STATUS_MASK      0x70
+#define SX1262_STATUS_READY     0x10
+#define SX1262_STATUS_TX        0x20
+#define SX1262_STATUS_RX        0x30
+
+/* Calibration parameters — image rejection band (start/end) */
+#define SX1262_CAL_IMG_430_440      0x6B, 0x6F
+#define SX1262_CAL_IMG_470_510      0x75, 0x81
+#define SX1262_CAL_IMG_779_787      0xC1, 0xC5
+#define SX1262_CAL_IMG_863_870      0xD7, 0xDB
+#define SX1262_CAL_IMG_902_928      0xE1, 0xE9
+
+/* Fallback modes */
+#define SX1262_FALLBACK_FS          0x40
+#define SX1262_FALLBACK_XOSC        0x30
+#define SX1262_FALLBACK_RC          0x20
+
+/* DIO2 RF switch modes */
+#define SX1262_RFSWITCH_DIO2_CTRL 0x01
+#define SX1262_RFSWITCH_DIO3_CTRL 0x02
+
+/* Device error flags */
+#define SX1262_ERR_PA_RAMP       0x0100
+#define SX1262_ERR_PLL_LOCK      0x0040
+#define SX1262_ERR_XOSC_START    0x0020
+#define SX1262_ERR_IMG_CALIB     0x0010
+#define SX1262_ERR_ADC_CALIB     0x0008
+#define SX1262_ERR_PLL_CALIB     0x0004
+#define SX1262_ERR_RC13M_CALIB   0x0002
+#define SX1262_ERR_RC64K_CALIB   0x0001
+
+#endif /* __SX1262_REGS_H */

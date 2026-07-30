@@ -1,0 +1,546 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2022 Rockchip Electronics Co., Ltd.
+ */
+#include "rv1106-amp.dtsi"
+
+/ {
+	chosen {
+		bootargs = "earlycon=uart8250,mmio32,0xff4c0000 console=ttyFIQ0 root=/dev/mmcblk1p7 rootwait snd_soc_core.prealloc_buffer_size_kbytes=16 coherent_pool=0";
+	};
+
+	acodec_sound: acodec-sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "rv-acodec";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,mclk-fs = <256>;
+		simple-audio-card,cpu {
+			sound-dai = <&i2s0_8ch>;
+		};
+		simple-audio-card,codec {
+			sound-dai = <&acodec>;
+		};
+	};
+
+	vcc_1v8: vcc-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_1v8";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+	vcc_3v3: vcc-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_3v3";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	vdd_arm: vdd-arm {
+		compatible = "regulator-fixed";
+		regulator-name = "vdd_arm";
+		regulator-min-microvolt = <900000>;
+		regulator-max-microvolt = <900000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+	leds: leds {
+		compatible = "gpio-leds";
+		work_led: work{
+			gpios = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "activity";
+			default-state = "on";
+		};	
+	};
+
+};
+
+/***************************** AUDIO ********************************/
+&i2s0_8ch {
+	#sound-dai-cells = <0>;
+	status = "okay";
+};
+
+&acodec {
+	#sound-dai-cells = <0>;
+	pa-ctl-gpios = <&gpio1 RK_PA1 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+/***************************** CPU ********************************/
+&cpu0 {
+	cpu-supply = <&vdd_arm>;
+};
+
+/***************************** ADC ********************************/
+/* SARADC (SoC successive-approximation ADC) unused — disabled so it does not
+ * register an IIO device (otherwise it takes iio:device0 before the BME280). */
+&saradc {
+	status = "disabled";
+	vref-supply = <&vcc_1v8>;
+};
+
+&tsadc {
+	status = "okay";
+};
+
+/***************************** CSI ********************************/
+&csi2_dphy_hw {
+	status = "okay";
+};
+
+&csi2_dphy0 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			csi_dphy_input0: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&sc3336_out>;
+				data-lanes = <1 2>;
+			};
+
+			csi_dphy_input1: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&mis5001_out>;
+				data-lanes = <1 2>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			csi_dphy_output: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&mipi_csi2_input>;
+			};
+		};
+	};
+};
+
+&i2c4 {
+	status = "okay";
+	clock-frequency = <400000>;
+
+	sc3336: sc3336@30 {
+		compatible = "smartsens,sc3336";
+		status = "okay";
+		reg = <0x30>;
+		clocks = <&cru MCLK_REF_MIPI0>;
+		clock-names = "xvclk";
+		pwdn-gpios = <&gpio3 RK_PC5 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&mipi_refclk_out0>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "CMK-OT2119-PC1";
+		rockchip,camera-module-lens-name = "30IRC-F16";
+		port {
+			sc3336_out: endpoint {
+				remote-endpoint = <&csi_dphy_input0>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+
+	mis5001: mis5001@31 {
+		compatible = "imagedesign,mis5001";
+		status = "okay";
+		reg = <0x31>;
+		clocks = <&cru MCLK_REF_MIPI0>;
+		clock-names = "xvclk";
+		reset-gpios = <&gpio3 RK_PC5 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&mipi_refclk_out0>;
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "CMK-OT2115-PC1";
+		rockchip,camera-module-lens-name = "30IRC-F16";
+		port {
+			mis5001_out: endpoint {
+				remote-endpoint = <&csi_dphy_input1>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+};
+
+&mipi0_csi2 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_csi2_input: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&csi_dphy_output>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi_csi2_output: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&cif_mipi_in>;
+			};
+		};
+	};
+};
+
+&rkcif {
+	status = "okay";
+};
+
+&rkcif_mipi_lvds {
+	status = "okay";
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&mipi_pins>;
+	port {
+		/* MIPI CSI-2 endpoint */
+		cif_mipi_in: endpoint {
+			remote-endpoint = <&mipi_csi2_output>;
+		};
+	};
+};
+
+&rkcif_mipi_lvds_sditf {
+	status = "okay";
+
+	port {
+		/* MIPI CSI-2 endpoint */
+		mipi_lvds_sditf: endpoint {
+			remote-endpoint = <&isp_in>;
+		};
+	};
+};
+
+&rkisp {
+	status = "okay";
+};
+
+&rkisp_vir0 {
+	status = "okay";
+
+	port@0 {
+		isp_in: endpoint {
+			remote-endpoint = <&mipi_lvds_sditf>;
+		};
+	};
+};
+
+
+/*****************************PINCTRL********************************/
+// SPI
+&spi0 {
+	pinctrl-0 = <&spi0m0_clk &spi0m0_miso &spi0m0_mosi &spi0m0_cs0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	/* CubeSat migración: SPI0 + SX1262 los posee ahora el MCU (RadioService
+	 * por rpmsg, applications/radio_service.c). Linux no toca este bus. */
+	status = "disabled";
+	sx1262@0 {
+		compatible = "semtech,sx1262";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sx1262_dev0_pins>;
+		reset-gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_LOW>;
+		busy-gpios = <&gpio3 RK_PA7 GPIO_ACTIVE_HIGH>;
+		dio1-gpios = <&gpio3 RK_PA3 GPIO_ACTIVE_HIGH>;
+		ant-sw0-gpios = <&gpio0 RK_PA3 GPIO_ACTIVE_HIGH>;
+		ant-sw1-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&spi1 {
+	pinctrl-0 = <&spi1m0_pins &spi1m0_cs0>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	/* CubeSat migración: SPI1 cedido al MCU (radio 1, paso posterior). */
+	status = "disabled";
+	sx1262@0 {
+		compatible = "semtech,sx1262";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&sx1262_dev1_pins>;
+		reset-gpios = <&gpio1 RK_PC6 GPIO_ACTIVE_LOW>;
+		busy-gpios = <&gpio1 RK_PC7 GPIO_ACTIVE_HIGH>;
+		dio1-gpios = <&gpio1 RK_PD1 GPIO_ACTIVE_HIGH>;
+		ant-sw0-gpios = <&gpio1 RK_PC5 GPIO_ACTIVE_HIGH>;
+		ant-sw1-gpios = <&gpio1 RK_PD0 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+/*
+ * Peripherals whose (board-routed) pins are reused by the two SX1262 radios.
+ * Their pinctrl-0 mux groups (set above) drive pins the radios occupy:
+ *   uart3(m1) PD1/PD0, uart4(m1) PC5, uart5(m0) PA7/PA6,
+ *   pwm2/4/5/6(m2) PC0/PC1/PC2/PC3 (SPI0), pwm3(m2) PD0,
+ *   pwm9(m1) PC5, pwm10(m1) PC6/PD1, pwm11(m1) PC7.
+ */
+&uart3 { status = "disabled"; };
+&uart4 { status = "disabled"; };
+&uart5 { status = "disabled"; };
+&pwm2  { status = "disabled"; };
+&pwm3  { status = "disabled"; };
+&pwm4  { status = "disabled"; };
+&pwm5  { status = "disabled"; };
+&pwm6  { status = "disabled"; };
+&pwm9  { status = "disabled"; };
+&pwm10 { status = "disabled"; };
+&pwm11 { status = "disabled"; };
+
+// I2C
+/*
+ * I2C0 is CEDED TO THE RISC-V MCU (SensorService — docs/migration/implementation/90-mcu-config-replication.md).
+ * The MCU owns BME280 (@0x76) and ICM-42670 (@0x68) over I2C0 and exposes them
+ * to Linux via rpmsg ("rpmsg-sensor", /dev/rpmsg1, client sensor_test), exactly
+ * as the SX1262 radios were ceded on SPI0/SPI1. Disabling the Linux controller
+ * frees the i2c0m0 pins (SCL=GPIO1_A3, SDA=GPIO1_A4) and the bus for the MCU;
+ * the in-tree bmp280 and the icm42670.ko no longer probe (expected).
+ * The child nodes are kept below only as wiring documentation (parent disabled).
+ * The &gpio0 AD0 hog is retained so ICM-42670 stays at address 0x68.
+ */
+&i2c0 {
+	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0m0_xfer>;
+	clock-frequency = <400000>;
+
+	bme280: bme280@76 {
+		compatible = "bosch,bme280";
+		reg = <0x76>;
+	};
+
+	/*
+	 * ICM-42670-P 6-axis IMU, same I2C0 bus (AP_SCKL=GPIO1_A3,
+	 * AP_SDI=GPIO1_A4). AP_AD0=GPIO0_A5 is forced low by a gpio-hog
+	 * (see &gpio0 below) so the address is 0x68. INT1=GPIO0_A1 is wired
+	 * as the data-ready interrupt; INT2=GPIO0_A0 and FSYNC=GPIO0_A2 are
+	 * routed for future use.
+	 */
+	icm42670: icm42670@68 {
+		compatible = "invensense,icm42670p";
+		reg = <0x68>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&icm42670_pins>;
+		interrupt-parent = <&gpio0>;
+		interrupts = <RK_PA1 IRQ_TYPE_LEVEL_HIGH>;
+	};
+};
+
+/* Force ICM-42670-P AP_AD0 (GPIO0_A5) low -> I2C address 0x68. */
+&gpio0 {
+	icm42670_ad0_hog: icm42670-ad0-hog {
+		gpio-hog;
+		gpios = <RK_PA5 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "icm42670-ad0";
+	};
+};
+
+&i2c1 {
+	pinctrl-0 = <&i2c1m1_xfer>;
+};
+
+&i2c3 {
+	pinctrl-0 = <&i2c3m1_xfer &i2c3m0_xfer>;
+};
+
+&i2c4 {
+	pinctrl-names = "default", "conifg";
+	pinctrl-0 = <&i2c4m2_xfer>;
+	pinctrl-1 = <&i2c4m0_xfer>;
+};
+
+// UART
+&uart0 {
+	pinctrl-0 = <&uart0m0_xfer &uart0m1_xfer>;
+};
+&uart1 {
+	pinctrl-0 = <&uart1m1_xfer>;
+};
+&uart3 {
+	pinctrl-0 = <&uart3m1_xfer>;
+};
+&uart4 {
+	pinctrl-0 = <&uart4m1_xfer>;
+};
+&uart5 {
+	pinctrl-0 = <&uart5m0_xfer>;
+};
+
+// PWM
+&pwm0 {
+	pinctrl-0 = <&pwm0m1_pins>;
+};
+&pwm2 {
+	pinctrl-0 = <&pwm2m2_pins>;
+};
+&pwm3 {
+	pinctrl-0 = <&pwm3m2_pins>;
+};
+&pwm4 {
+	pinctrl-0 = <&pwm4m2_pins>;
+};
+&pwm5 {
+	pinctrl-0 = <&pwm5m1_pins &pwm5m2_pins>;
+};
+&pwm6 {
+	pinctrl-0 = <&pwm6m1_pins &pwm6m2_pins>;
+};
+&pwm8 {
+	pinctrl-0 = <&pwm8m1_pins>;
+};
+&pwm9 {
+	pinctrl-0 = <&pwm9m1_pins>;
+};
+&pwm10 {
+	pinctrl-0 = <&pwm10m1_pins &pwm10m2_pins>;
+};
+&pwm11 {
+	pinctrl-0 = <&pwm11m1_pins &pwm11m2_pins>;
+};
+
+&pinctrl {
+	spi0 {
+		spi0m0_clk: spi0m0-clk {
+			rockchip,pins = <1 RK_PC1 4 &pcfg_pull_none>;
+		};
+		spi0m0_mosi: spi0m0-mosi {
+			rockchip,pins = <1 RK_PC2 6 &pcfg_pull_none>;
+		};
+		spi0m0_miso: spi0m0-miso {
+			rockchip,pins = <1 RK_PC3 6 &pcfg_pull_none>;
+		};
+		spi0m0_cs0: spi0m0-cs0 {
+			rockchip,pins = <1 RK_PC0 4 &pcfg_pull_none>;
+		};
+	};
+
+	sx1262 {
+		sx1262_dev0_pins: sx1262-dev0-pins {
+			rockchip,pins =
+				<3 RK_PA6 RK_FUNC_GPIO &pcfg_pull_up>,
+				<3 RK_PA7 RK_FUNC_GPIO &pcfg_pull_up>,
+				<3 RK_PA3 RK_FUNC_GPIO &pcfg_pull_none>,
+				<0 RK_PA3 RK_FUNC_GPIO &pcfg_pull_none>,
+				<0 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+		sx1262_dev1_pins: sx1262-dev1-pins {
+			rockchip,pins =
+				<1 RK_PC6 RK_FUNC_GPIO &pcfg_pull_up>,
+				<1 RK_PC7 RK_FUNC_GPIO &pcfg_pull_up>,
+				<1 RK_PD1 RK_FUNC_GPIO &pcfg_pull_none>,
+				<1 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>,
+				<1 RK_PD0 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	icm42670 {
+		/* INT1, INT2, FSYNC and AP_AD0 as GPIO (i2c SCL/SDA via i2c0m0). */
+		icm42670_pins: icm42670-pins {
+			rockchip,pins =
+				<0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>,
+				<0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>,
+				<0 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>,
+				<0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+};
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * CubeSat Paso 0 — A7 <-> RISC-V (HPMCU) RPMsg transport.
+ * Mirrors rk3562-amp.dtsi (arm32 single-cell). The vring "reg" base and the
+ * reserved-memory base MUST match the MCU firmware linker symbol
+ * __linux_share_rpmsg_start__ (= 0x0ff00000) and rockchip,link-id must match
+ * RL_PLATFORM_SET_LINK_ID(0,4)=0x04 used by the firmware.
+ * See docs/migration/implementation/60-ipc-bringup.md.
+ * ----------------------------------------------------------------------------
+ */
+&mailbox {
+	status = "okay";
+};
+
+/ {
+	rpmsg: rpmsg@ff00000 {
+		compatible = "rockchip,rv1106-rpmsg";
+		mbox-names = "rpmsg-rx", "rpmsg-tx";
+		mboxes = <&mailbox 0 &mailbox 3>;
+		rockchip,vdev-nums = <1>;
+		rockchip,link-id = <0x04>;
+		reg = <0x0ff00000 0x20000>;
+		memory-region = <&rpmsg_dma_reserved>;
+		status = "okay";
+	};
+
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* RISC-V MCU firmware (rtthread.bin) EXECUTES from 0x40000 (bootrom Hpmcu
+		 * LOAD_ADDR=0x40000). This region (0x40000..0x7c000, matching the MCU
+		 * link.lds ORIGIN/LENGTH) MUST be carved out of Linux RAM, or the kernel
+		 * overwrites the MCU's code/stack ~400ms into boot and the SCR1 crashes
+		 * (stack pointer trashed). Mirrors Luckfox rv1106-thunder-boot.dtsi
+		 * rtos@40000 + ramoops@7c000.
+		 *
+		 * Deliberately NO no-map here (Luckfox style): a plain reservation
+		 * keeps Linux from touching it. With no-map they punch a NOMAP
+		 * hole at 0x40000, the first usable block then ends at 0x40000
+		 * (not PMD/2MB aligned), adjust_lowmem_bounds() computes
+		 * memblock_limit=0x40000, rounds it down to 0, and the no-HIGHMEM
+		 * "Ignoring RAM" branch memblock_remove()s ALL of DRAM ->
+		 * early_alloc panic in paging_init. */
+		rtos: rtos@40000 {
+			reg = <0x40000 0x3c000>;
+		};
+
+		ramoops@7c000 {
+			reg = <0x7c000 0x3000>;
+		};
+
+		/* Legacy trampoline DDR-copy region (no longer used; kept reserved). */
+		mcu_reserved: mcu@fe00000 {
+			reg = <0x0fe00000 0x100000>;
+			no-map;
+		};
+
+		rpmsg_reserved: rpmsg@ff00000 {
+			reg = <0x0ff00000 0x80000>;
+			no-map;
+		};
+
+		rpmsg_dma_reserved: rpmsg-dma@ff80000 {
+			compatible = "shared-dma-pool";
+			reg = <0x0ff80000 0x80000>;
+			no-map;
+		};
+	};
+};
