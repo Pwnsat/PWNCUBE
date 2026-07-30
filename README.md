@@ -1,6 +1,6 @@
 # PWNCUBE
 
-**A hardware-based CubeSat platform for aerospace cybersecurity research and training**, developed by PWNSAT in partnership with [ElectronicCats](https://github.com/ElectronicCats). PWNCUBE is a deliberate port of [FlatSat](https://github.com/Pwnsat/FlatSat)'s design and vulnerability set onto real dual-core flight-computer hardware (Rockchip RV1106 — Cortex-A7 Linux + RISC-V RT-Thread), demonstrating that the same class of satellite command-and-control vulnerabilities reproduces across genuinely different hardware, not just one reference board.
+**A hardware-based CubeSat platform for aerospace cybersecurity research and training**, developed by PWNSAT in partnership with [ElectronicCats](https://github.com/ElectronicCats). PWNCUBE is a satellite design and vulnerability set onto real dual-core flight-computer hardware (Rockchip RV1106 — Cortex-A7 Linux + RISC-V RT-Thread), demonstrating that the same class of satellite command-and-control vulnerabilities reproduces across genuinely different hardware, not just one reference board.
 
 Full documentation, architecture diagrams, and step-by-step guides live in the **[Wiki](../../wiki)**.
 
