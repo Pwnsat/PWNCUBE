@@ -254,7 +254,17 @@ static void telemetry_spp_pack_frame(float x, float y, float z, float t,
     v = float_to_fixed(z, 100.0f); buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
     v = float_to_fixed(t, 100.0f); buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
     v = float_to_fixed(tm, 100.0f);buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
+    /* KNOWN ISSUE: p is hPa (typ. 900-1100) -- p*100 always exceeds int16_t
+     * range (max 327.67) for any real atmospheric pressure, so this field
+     * wraps around unconditionally. See Firmware/README.md's "Known
+     * limitation" note. Not yet fixed -- needs a wider encoding, not a
+     * scale tweak (halving the scale would lose precision that matters
+     * elsewhere this field is used). */
     v = float_to_fixed(p, 100.0f); buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
+    /* alt is derived from p via the hypsometric formula (see below); it
+     * shares the same int16_t*100 overflow risk whenever the true
+     * altitude relative to the 1013.25hPa sea-level reference exceeds
+     * about +-327m -- which it will, on most real boards/locations. */
     v = float_to_fixed(alt, 100.0f);buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
     v = float_to_fixed(hum, 100.0f);buf[off++] = (uint8_t)(v & 0xFF); buf[off++] = (uint8_t)((v >> 8) & 0xFF);
 

@@ -210,8 +210,15 @@ component:
 | `rkbin` (not in this repo's tree — see the [v6 Release](../../releases/tag/v6)) | Proprietary, Rockchip |
 
 Known limitation, documented rather than hidden: **the sensor telemetry
-frame's altitude field can overflow its 16-bit fixed-point encoding**
-(pressure-derived altitude × 100 exceeds `int16_t` range under normal
-atmospheric conditions) — tracked as a known issue, not yet fixed. See
-`docs/security/exploitation-guide.en.md` for the full, deliberately
-reintroduced vulnerability catalog this platform demonstrates.
+frame's pressure and altitude fields can overflow their 16-bit fixed-point
+encoding.** Pressure (hPa × 100) exceeds `int16_t` range for *any* real
+atmospheric pressure — this field wraps around unconditionally, on every
+board, regardless of location. Altitude (derived from pressure via the
+hypsometric formula, × 100) overflows whenever the true altitude relative
+to the 1013.25hPa sea-level reference exceeds roughly ±327m, which it will
+on most real boards/locations. Both are tracked as a known issue, not yet
+fixed (see the inline comments at `telemetry_spp_pack_frame()` in
+`src/mcu/rt-thread/bsp/rockchip/rv1106-mcu/applications/command_service.c`).
+See `docs/security/exploitation-guide.en.md` for the full, deliberately
+reintroduced vulnerability catalog this platform demonstrates (a separate
+concern from this encoding bug).
