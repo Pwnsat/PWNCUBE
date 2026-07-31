@@ -1,4 +1,4 @@
-# PWNCUBE
+# PWNCUBE - The Vulnerable Satellite Hacking Platform for Learning Through Research
 
 **A hardware-based CubeSat platform for aerospace cybersecurity research and training**, developed by PWNSAT in partnership with [ElectronicCats](https://github.com/ElectronicCats). PWNCUBE is a satellite design and vulnerability set onto real dual-core flight-computer hardware (Rockchip RV1106 — Cortex-A7 Linux + RISC-V RT-Thread), demonstrating that the same class of satellite command-and-control vulnerabilities reproduces across genuinely different hardware, not just one reference board.
 
