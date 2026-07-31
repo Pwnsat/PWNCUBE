@@ -20,13 +20,13 @@ Linux (Cortex-A7)                      RT-Thread (SCR1 "HPMCU", rv32imc)
 ─────────────────────────             ──────────────────────────────────
 radio_test (userspace)                 RadioService  (radio_service.c)
    │ /dev/rpmsg0                          │ endpoint 0x4005 "rpmsg-radio"
-virtio_rpmsg / rockchip_rpmsg          rpmsg-lite REMOTE (poll, sin IRQ RX)
+virtio_rpmsg / rockchip_rpmsg          rpmsg-lite REMOTE (poll, no RX IRQ)
    │ vrings @0xFF00000                    │
-mailbox 0xff5c0000 (kicks) ─────────── ISR ack-ciego + hilo de poll
+mailbox 0xff5c0000 (kicks) ─────────── ISR blind-ack + poll thread
                                           │
-                                       sx1262_cmd.c (COMPARTIDO con Linux)
+                                       sx1262_cmd.c (SHARED with Linux)
                                           │ sx1262_port_rtt.c
-                                       HAL_SPI PIO → SPI0 → SX1262 físico
+                                       HAL_SPI PIO → SPI0 → SX1262 (physical)
 ```
 
 Design rule (doc 40): Linux = mission, **never** touches migrated hardware;
@@ -149,7 +149,7 @@ Resulting design (`rpmsg_platform.c` RV1106 + `ping_echo.c`):
    | VRING_SIZE / ALIGN | `0x8000` / `0x1000` | rockchip_rpmsg.h | rpmsg_platform.h |
    | Buffers | 64 × (496+16) | RPMSG_BUF_* | RL_BUFFER_* |
    | link-id | `0x04` | DT `rockchip,link-id` | `RL_PLATFORM_SET_LINK_ID(0,4)` |
-   | vq map | vq0@0xFF00000=TX del remoto, vq1@0xFF08000=RX del remoto | vring0=rvq host | callback[0]=tx |
+   | vq map | vq0@0xFF00000=TX from the remote, vq1@0xFF08000=RX from the remote | vring0=rvq host | callback[0]=tx |
 
 ---
 
@@ -193,7 +193,7 @@ that works is **direct HAL**, with no RT-Thread driver framework:
   #ifdef __KERNEL__
   #include <linux/...>; #include "sx1262.h"
   #else
-  #include "sx1262_port.h"       /* el shim RT-Thread */
+  #include "sx1262_port.h"       /* the RT-Thread shim */
   #endif
   ```
 - `sx1262_port.h` provides the minimal linux-isms: `struct spi_transfer`,

@@ -11,22 +11,22 @@
 
 ```
  ┌──────────────────────── Linux / Cortex-A7 ────────────────────────┐
- │  Software de misión · Telemetría · Telecomandos · CCSDS · Storage  │
+ │  Mission software · Telemetry · Telecommands · CCSDS · Storage     │
  │  ───────────────────────────────────────────────────────────────  │
- │  Clientes de servicio (reemplazan a la CLI/sysfs actuales):        │
+ │  Service clients (replace the current CLI/sysfs):                 │
  │    radio_test · sensor_test · telemetry-client · command-client    │
  │  ───────────────────────────────────────────────────────────────  │
- │  Capa de transporte:  /dev/rpmsg* (rockchip_rpmsg)                 │
+ │  Transport layer:  /dev/rpmsg* (rockchip_rpmsg)                    │
  └───────────────────────────────┬───────────────────────────────────┘
                                   │  RPMsg / Mailbox / vrings (doc 20)
  ┌───────────────────────────────┴───────────────────────────────────┐
  │  RT-Thread / RISC-V (HPMCU)                                        │
- │  Dispatcher IPC (tabla cmd→handler, patrón rpmsg_cmd)              │
+ │  IPC dispatcher (cmd→handler table, rpmsg_cmd pattern)             │
  │  ───────────────────────────────────────────────────────────────  │
  │  RadioService · SensorService · TelemetryService · CommandService  │
  │  ───────────────────────────────────────────────────────────────  │
- │  Drivers portados:  sx1262 (SPI) · bme280 (I²C) · icm42670 (I²C)   │
- │  HAL Rockchip:  HAL_SPI · HAL_I2C · HAL_GPIO · HAL_PINCTRL         │
+ │  Ported drivers:  sx1262 (SPI) · bme280 (I²C) · icm42670 (I²C)     │
+ │  Rockchip HAL:  HAL_SPI · HAL_I2C · HAL_GPIO · HAL_PINCTRL         │
  └───────────────────────────────┬───────────────────────────────────┘
                                   │
                             Hardware (SX1262 ×2, BME280, ICM-42670)
@@ -121,10 +121,10 @@ driver a thin portability layer, e.g.:
 
 ```
 src/sx1262-kmod/
-  sx1262_cmd.c     sx1262_regs.h      <- PORTABLE: sin cambios o casi
-  sx1262_port.h                       <- NUEVO: macros SPI/GPIO/delay/log
-  sx1262_port_linux.c                 <- glue actual (extraído de _hal.c/_core.c)
-  sx1262_port_rtt.c                   <- NUEVO: glue RT-Thread (HAL_SPI/GPIO)
+  sx1262_cmd.c     sx1262_regs.h      <- PORTABLE: no changes, or nearly none
+  sx1262_port.h                       <- NEW: SPI/GPIO/delay/log macros
+  sx1262_port_linux.c                 <- current glue (extracted from _hal.c/_core.c)
+  sx1262_port_rtt.c                   <- NEW: RT-Thread glue (HAL_SPI/GPIO)
 ```
 
 `sx1262_cmd.c` would call `sx_spi_xfer()`, `sx_gpio_set()`, `sx_delay_ms()` defined

@@ -22,10 +22,10 @@
 struct ipc_hdr {           /* little-endian */
     uint8_t  version;      /* =1 */
     uint8_t  service;      /* RADIO=1, SENSOR=2, CONFIG=3, EVENT=4 */
-    uint8_t  cmd;          /* específico del servicio */
+    uint8_t  cmd;          /* service-specific */
     uint8_t  flags;        /* bit0=RESPONSE, bit1=EVENT, bit2=ERROR, bit3=MORE_FRAGS */
-    uint16_t req_id;       /* correlación request/response */
-    uint16_t len;          /* bytes de payload que siguen */
+    uint16_t req_id;       /* request/response correlation */
+    uint16_t len;          /* payload bytes that follow */
     /* payload[len] */
 };
 ```

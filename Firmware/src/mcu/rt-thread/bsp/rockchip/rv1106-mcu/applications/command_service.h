@@ -23,7 +23,7 @@ void command_service_init(void);
 void command_service_poll(void);
 void command_service_poll_flush(void);
 
-/* Thruster state (leido por telemetry_service) */
+/* Thruster state (read by telemetry_service) */
 uint8_t command_get_thruster0(void);
 uint8_t command_get_thruster1(void);
 uint32_t command_get_beacon_interval_ms(void);

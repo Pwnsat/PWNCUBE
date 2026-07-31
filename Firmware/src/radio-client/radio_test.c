@@ -320,7 +320,7 @@ static const char *radio_err_str(uint8_t e)
     case 0x00: return "OK";
     case 0x01: return "ERROR (SPI/comm)";
     case 0x02: return "ERROR (reset)";
-    case 0x10: return "NOT_INITED (corre 'init' primero)";
+    case 0x10: return "NOT_INITED (run 'init' first)";
     default:   return "ERROR (unknown)";
     }
 }
@@ -966,10 +966,10 @@ int main(int argc, char **argv)
                         printf("   -> effect: thruster%u power=%u (no downlink; see cmd_status)\n",
                                rsp[13], rsp[14]);
                     else if (apid == 0x05 && n >= 14)
-                        printf("   -> efecto: beacon_rate=%us %s(sin downlink)\n",
-                               rsp[13], rsp[13] > 10 ? "[RECHAZADO >10s] " : "");
+                        printf("   -> effect: beacon_rate=%us %s(no downlink)\n",
+                               rsp[13], rsp[13] > 10 ? "[REJECTED >10s] " : "");
                     else if (apid == 0x02)
-                        printf("   -> efecto: RESET del satelite (sin downlink)\n");
+                        printf("   -> effect: satellite RESET (no downlink)\n");
                     fflush(stdout);
                 }
             }
@@ -1081,7 +1081,7 @@ int main(int argc, char **argv)
         n = xfer(fd, req, len, rsp, sizeof(rsp), 3000);
         if (n < 2 || rsp[1] != 0) {
             if (n >= 2 && rsp[1] == RADIO_ERR_NOT_INITED)
-                fprintf(stderr, "radio sin configurar. Corre primero: radio_test init 915000000\n");
+                fprintf(stderr, "radio not configured. Run first: radio_test init 915000000\n");
             else
                 fprintf(stderr, "rx_start failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
             close_ept(fd); return 1;
