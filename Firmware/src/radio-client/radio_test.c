@@ -440,7 +440,7 @@ int main(int argc, char **argv)
     /* optional  -r N  radio selector */
     if (argc >= 3 && !strcmp(argv[1], "-r")) {
         inst = atoi(argv[2]);
-        if (inst < 0 || inst > 1) { fprintf(stderr, "error: radio debe ser 0 o 1.\n"); return 2; }
+        if (inst < 0 || inst > 1) { fprintf(stderr, "error: radio must be 0 or 1.\n"); return 2; }
         argv += 2; argc -= 2;
     }
 
@@ -525,7 +525,7 @@ int main(int argc, char **argv)
         q[9] = (uint8_t)cr; q[10] = (uint8_t)(int8_t)pwr;
         n = xfer(fd, q, 11, rsp, sizeof(rsp), 6000);
         if (n < 2 || rsp[1] != 0) {
-            fprintf(stderr, "init: fallo (err=0x%02x)\n", n >= 2 ? rsp[1] : 0xFF);
+            fprintf(stderr, "init: failed (err=0x%02x)\n", n >= 2 ? rsp[1] : 0xFF);
             close_ept(fd); return 1;
         }
         /* 2) SET_PKT_PARAMS: preamble/CRC/IQ (sticky on the MCU, applied by TX+RX) */
@@ -1083,7 +1083,7 @@ int main(int argc, char **argv)
             if (n >= 2 && rsp[1] == RADIO_ERR_NOT_INITED)
                 fprintf(stderr, "radio sin configurar. Corre primero: radio_test init 915000000\n");
             else
-                fprintf(stderr, "rx_start fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
+                fprintf(stderr, "rx_start failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
             close_ept(fd); return 1;
         }
         if (rx_ms)
@@ -1127,13 +1127,13 @@ int main(int argc, char **argv)
         for (i = 0; i < 2; i++) {
             uint8_t r[8] = { 0x05, (uint8_t)i, f>>24, f>>16, f>>8, f };
             n = xfer(fd, r, 6, m, sizeof(m), 6000);
-            if (n < 2 || m[1] != 0) { fprintf(stderr, "init radio %d fallo (err=0x%02x)\n", i, n>=2?m[1]:0xFF); close_ept(fd); return 1; }
+            if (n < 2 || m[1] != 0) { fprintf(stderr, "init radio %d failed (err=0x%02x)\n", i, n>=2?m[1]:0xFF); close_ept(fd); return 1; }
             printf("loopback: radio %d init @ %u Hz OK\n", i, f);
         }
         /* rx radio listens (8 s window) */
         { uint8_t r[4] = { 0x0E, (uint8_t)rxi, (8000>>8)&0xFF, 8000&0xFF };
           n = xfer(fd, r, 4, m, sizeof(m), 3000);
-          if (n < 2 || m[1] != 0) { fprintf(stderr, "rx_start radio %d fallo\n", rxi); close_ept(fd); return 1; } }
+          if (n < 2 || m[1] != 0) { fprintf(stderr, "rx_start radio %d failed\n", rxi); close_ept(fd); return 1; } }
         printf("loopback: radio %d listening; radio %d transmitting \"%s\"...\n", rxi, txi, text);
         /* tx radio transmits (reply arrives after TX_DONE) */
         { uint8_t r[512] = { 0x0D, (uint8_t)txi, (uint8_t)plen }; memcpy(&r[3], text, plen);

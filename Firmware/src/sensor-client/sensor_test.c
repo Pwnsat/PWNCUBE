@@ -1,9 +1,9 @@
 /*
- * CubeSat — cliente del SensorService (BME280 + ICM-42670 en el MCU RISC-V).
+ * CubeSat — SensorService client (BME280 + ICM-42670 on the RISC-V MCU).
  *
- * Los sensores I2C0 los posee el firmware RT-Thread del MCU; esta herramienta
- * los consulta por IPC (rpmsg). El canal "rpmsg-sensor" se liga en el arranque
- * (rcS). Ver docs/migration/{design/40-migration-design,implementation/90-mcu-config-replication}.md.
+ * The I2C0 sensors are owned by the MCU's RT-Thread firmware; this tool
+ * queries them over IPC (rpmsg). The "rpmsg-sensor" channel is bound at boot
+ * (rcS). See docs/migration/{design/40-migration-design,implementation/90-mcu-config-replication}.md.
  */
 #include <stdio.h>
 #include <stdint.h>
@@ -30,17 +30,17 @@ static uint32_t g_src;   /* unique per-process src, so we can find our endpoint 
 static void usage(void)
 {
     puts(
-"sensor_test — lee los sensores I2C0 (BME280 + ICM-42670) que posee el MCU\n"
+"sensor_test — reads the I2C0 sensors (BME280 + ICM-42670) owned by the MCU\n"
 "\n"
-"USO:  sensor_test <comando>\n"
+"USAGE:  sensor_test <command>\n"
 "\n"
-"COMANDOS:\n"
-"  ping             Verifica que el SensorService responde (id=SENS).\n"
-"  whoami <chip>    Lee el ID del chip. chip: bme (=0x60) o icm (=0x67).\n"
-"  bme              BME280: temperatura, presion y humedad compensadas.\n"
-"  imu              ICM-42670: aceleracion, giro y temperatura.\n"
+"COMMANDS:\n"
+"  ping             Check that SensorService responds (id=SENS).\n"
+"  whoami <chip>    Read the chip ID. chip: bme (=0x60) or icm (=0x67).\n"
+"  bme              BME280: compensated temperature, pressure, and humidity.\n"
+"  imu              ICM-42670: acceleration, gyro, and temperature.\n"
 "  all              bme + imu.\n"
-"  help             Esta ayuda.");
+"  help             This help text.");
 }
 
 /* Read /sys/class/rpmsg/rpmsgN/src (the endpoint's local address), or -1. */
@@ -93,8 +93,8 @@ static int open_ept(void)
 
     ctrl = find_sensor_ctrl();
     if (ctrl < 0) {
-        fprintf(stderr, "error: no encuentro el canal rpmsg-sensor (¿arranco el MCU? ¿rcS lo ligo?).\n"
-                        "Revisa: ls /sys/bus/rpmsg/devices/  (deberia estar virtio0.rpmsg-sensor.*)\n");
+        fprintf(stderr, "error: can't find channel rpmsg-sensor (did the MCU boot? did rcS bind it?).\n"
+                        "Check: ls /sys/bus/rpmsg/devices/  (should show virtio0.rpmsg-sensor.*)\n");
         return -1;
     }
     g_src = 0x5000 + (uint32_t)(getpid() & 0x0FFF);
@@ -120,7 +120,7 @@ static int open_ept(void)
         }
         usleep(20000);
     }
-    fprintf(stderr, "error: no aparecio el endpoint /dev/rpmsgN tras crearlo.\n");
+    fprintf(stderr, "error: /dev/rpmsgN endpoint never appeared after creating it.\n");
     return -1;
 }
 
@@ -160,7 +160,7 @@ static int do_bme(int fd)
     int n = xfer(fd, req, 1, rsp, sizeof(rsp), 3000);
 
     if (n < 14 || rsp[1] != 0) {
-        fprintf(stderr, "bme: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
+        fprintf(stderr, "bme: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
         return 1;
     }
     {
@@ -180,7 +180,7 @@ static int do_imu(int fd)
     int n = xfer(fd, req, 1, rsp, sizeof(rsp), 3000);
 
     if (n < 16 || rsp[1] != 0) {
-        fprintf(stderr, "imu: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
+        fprintf(stderr, "imu: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF);
         return 1;
     }
     {
@@ -216,24 +216,24 @@ int main(int argc, char **argv)
         n = xfer(fd, req, 1, rsp, sizeof(rsp), 3000);
         if (n >= 7 && rsp[1] == 0)
             printf("ping: err=0x%02x id=%c%c%c%c v%d\n", rsp[1], rsp[2], rsp[3], rsp[4], rsp[5], rsp[6]);
-        else { fprintf(stderr, "ping: sin respuesta valida (n=%d)\n", n); rc = 1; }
+        else { fprintf(stderr, "ping: no valid response (n=%d)\n", n); rc = 1; }
     }
     else if (!strcmp(cmd, "whoami")) {
         uint8_t req[2] = { 0x02, 0 };
         int chip;
-        if (argc < 3) { fprintf(stderr, "error: falta <chip> (bme|icm)\n"); close_ept(fd); return 2; }
+        if (argc < 3) { fprintf(stderr, "error: missing <chip> (bme|icm)\n"); close_ept(fd); return 2; }
         chip = (!strcmp(argv[2], "icm") || !strcmp(argv[2], "1")) ? 1 : 0;
         req[1] = (uint8_t)chip;
         n = xfer(fd, req, 2, rsp, sizeof(rsp), 3000);
         if (n >= 3 && rsp[1] == 0)
             printf("whoami %s: id=0x%02x (esperado %s)\n", chip ? "icm" : "bme",
                    rsp[2], chip ? "0x67" : "0x60");
-        else { fprintf(stderr, "whoami: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
+        else { fprintf(stderr, "whoami: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
     }
     else if (!strcmp(cmd, "bme"))  rc = do_bme(fd);
     else if (!strcmp(cmd, "imu"))  rc = do_imu(fd);
     else if (!strcmp(cmd, "all"))  { rc  = do_bme(fd); rc |= do_imu(fd); }
-    else { fprintf(stderr, "error: comando desconocido '%s'. Usa 'sensor_test help'.\n", cmd); rc = 2; }
+    else { fprintf(stderr, "error: unknown command '%s'. Try 'sensor_test help'.\n", cmd); rc = 2; }
 
     close_ept(fd);
     return rc;

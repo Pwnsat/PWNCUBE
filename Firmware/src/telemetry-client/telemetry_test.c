@@ -1,12 +1,11 @@
 /*
  * CubeSat — TelemetryService client + monitor (TX/RX packet sniffing).
  *
- * El servicio de telemetria corre en el MCU RISC-V (ept 0x4007
- * "rpmsg-telemetry"). La radio fisica es controlada por RadioService
+ * The telemetry service runs on the RISC-V MCU (ept 0x4007
+ * "rpmsg-telemetry"). The physical radio is controlled by RadioService
  * (ept 0x4005 "rpmsg-radio").
  *
- * Esta herramienta puede abrir ambos endpoints simultaneamente para
- * monitorizar TX y/o RX.
+ * This tool can open both endpoints simultaneously to monitor TX and/or RX.
  */
 #include <stdio.h>
 #include <stdint.h>
@@ -71,8 +70,8 @@ static int open_channel(const char *name, uint32_t dst)
                 goto found;
         }
     }
-    fprintf(stderr, "error: no encuentro el canal %s (arranco el MCU? rcS lo ligo?).\n"
-                    "Revisa: ls /sys/bus/rpmsg/devices/\n", name);
+    fprintf(stderr, "error: can't find channel %s (did the MCU boot? did rcS bind it?).\n"
+                    "Check: ls /sys/bus/rpmsg/devices/\n", name);
     return -1;
 
 found:
@@ -96,7 +95,7 @@ found:
         }
         usleep(20000);
     }
-    fprintf(stderr, "error: no aparecio el endpoint /dev/rpmsgN para %s.\n", name);
+    fprintf(stderr, "error: /dev/rpmsgN endpoint for %s never appeared.\n", name);
     return -1;
 }
 
@@ -122,7 +121,7 @@ static int xfer(int fd, const uint8_t *req, int req_len,
 static int need_arg(int have, const char *what)
 {
     if (have) return 0;
-    fprintf(stderr, "error: falta <%s>.\n", what);
+    fprintf(stderr, "error: missing <%s>.\n", what);
     return 1;
 }
 
@@ -213,35 +212,35 @@ static void print_packet(const char *prefix, const uint8_t *buf, int len)
 static void usage(void)
 {
     puts(
-"telemetry_test — control y monitor de telemetria CCSDS via SX1262\n"
+"telemetry_test — CCSDS telemetry control and monitor via SX1262\n"
 "\n"
-"USO:  telemetry_test <comando> [argumentos]\n"
+"USAGE:  telemetry_test <command> [arguments]\n"
 "\n"
-"COMANDOS DE CONTROL (solo telemetry_service):\n"
-"  ping                     Verifica que el TelemetryService responde.\n"
-"  start <inst> <ms>        Inicia TX periodica cada <ms> sobre radio <inst>.\n"
-"  stop                     Detiene la TX.\n"
-"  status                   Estado actual.\n"
-"  config <inst> <freq_hz>  Configura parametros LoRa.\n"
+"CONTROL COMMANDS (telemetry_service only):\n"
+"  ping                     Check that TelemetryService responds.\n"
+"  start <inst> <ms>        Start periodic TX every <ms> on radio <inst>.\n"
+"  stop                     Stop TX.\n"
+"  status                   Current status.\n"
+"  config <inst> <freq_hz>  Configure LoRa parameters.\n"
 "         <sf> <bw> <cr>\n"
 "         <pwr_dbm>\n"
 "\n"
-"COMANDO MONITOR (abre telemetry + radio):\n"
-"  monitor <inst> <flags>   Escucha paquetes. <flags> elige que ver:\n"
-"      1 = solo [Monitor TX] (telemetria propia)\n"
-"      2 = solo [Monitor RX] (paquetes de otro flatsat)\n"
-"      3 = ambos (TX + RX), por defecto\n"
-"    El radio escucha en Rx continua y tambien transmite tu telemetria.\n"
-"    Ctrl-C para salir.\n"
+"MONITOR COMMAND (opens telemetry + radio):\n"
+"  monitor <inst> <flags>   Listen for packets. <flags> picks what to show:\n"
+"      1 = [Monitor TX] only (your own telemetry)\n"
+"      2 = [Monitor RX] only (packets from another flatsat)\n"
+"      3 = both (TX + RX), default\n"
+"    The radio listens in continuous Rx and also transmits your telemetry.\n"
+"    Ctrl-C to exit.\n"
 "\n"
-"Valores por defecto (flatsat): 916 MHz, SF7, BW250, CR 4/5, 20 dBm, 10500 ms.\n"
+"Defaults (flatsat): 916 MHz, SF7, BW250, CR 4/5, 20 dBm, 10500 ms.\n"
 "\n"
-"EJEMPLOS:\n"
+"EXAMPLES:\n"
 "  telemetry_test config 0 916000000 7 250000 1 20\n"
 "  telemetry_test start 0 10500\n"
-"  telemetry_test monitor 0 1     # solo ver TX propia\n"
-"  telemetry_test monitor 0 2     # solo esnifar RX de otro flatsat\n"
-"  telemetry_test monitor 0 3     # ambos a la vez\n"
+"  telemetry_test monitor 0 1     # only watch your own TX\n"
+"  telemetry_test monitor 0 2     # only sniff RX from another flatsat\n"
+"  telemetry_test monitor 0 3     # both at once\n"
 "  telemetry_test status\n"
 "  telemetry_test stop");
 }
@@ -334,8 +333,8 @@ int main(int argc, char **argv)
     if (!strcmp(cmd, "monitor")) {
         int inst = (argc >= 3) ? atoi(argv[2]) : 0;
         if (argc >= 4) flags = atoi(argv[3]);
-        if (flags < 1 || flags > 3) { fprintf(stderr, "error: flags debe ser 1, 2 o 3.\n"); return 2; }
-        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst debe ser 0 o 1.\n"); return 2; }
+        if (flags < 1 || flags > 3) { fprintf(stderr, "error: flags must be 1, 2, or 3.\n"); return 2; }
+        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst must be 0 or 1.\n"); return 2; }
 
         if (flags & 1) {
             fd = open_channel("rpmsg-telemetry", TELEM_DST);
@@ -350,7 +349,7 @@ int main(int argc, char **argv)
             uint8_t mon_req[2] = { 0x06, 0x01 };
             n = xfer(fd, mon_req, 2, rsp, sizeof(rsp), 3000);
             if (n < 2 || rsp[1] != 0) {
-                fprintf(stderr, "monitor: fallo al activar monitor en MCU\n");
+                fprintf(stderr, "monitor: failed to enable monitor mode on the MCU\n");
                 close_ept(fd); close_ept(rf); return 1;
             }
         }
@@ -359,8 +358,8 @@ int main(int argc, char **argv)
             uint8_t rx_req[4] = { 0x0E, (uint8_t)inst, 0x00, 0x00 };
             n = xfer(rf, rx_req, 4, rsp, sizeof(rsp), 3000);
             if (n < 2 || rsp[1] != 0) {
-                fprintf(stderr, "monitor: fallo al iniciar RX en radio %d (n=%d err=0x%02x)\n"
-                                "Asegurate de haber hecho 'radio_test init %d' primero.\n",
+                fprintf(stderr, "monitor: failed to start RX on radio %d (n=%d err=0x%02x)\n"
+                                "Make sure you ran 'radio_test init %d' first.\n",
                         inst, n, n >= 2 ? rsp[1] : 0xFF,
                         inst == 0 ? 915000000 : 915000000);
                 close_ept(fd); close_ept(rf); return 1;
@@ -370,7 +369,7 @@ int main(int argc, char **argv)
         printf("[Monitor] activo:");
         if (fd >= 0) printf(" [Monitor TX]");
         if (rf >= 0) printf(" [Monitor RX] radio=%d", inst);
-        printf(". Ctrl-C para salir.\n");
+        printf(". Ctrl-C to exit.\n");
 
         rc = do_monitor(fd >= 0 ? fd : -2, rf >= 0 ? rf : -2);
         close_ept(fd);
@@ -388,28 +387,28 @@ int main(int argc, char **argv)
         if (n >= 7 && rsp[1] == 0)
             printf("ping: err=0x%02x id=%c%c%c%c v%d\n",
                    rsp[1], rsp[2], rsp[3], rsp[4], rsp[5], rsp[6]);
-        else { fprintf(stderr, "ping: sin respuesta valida (n=%d)\n", n); rc = 1; }
+        else { fprintf(stderr, "ping: no valid response (n=%d)\n", n); rc = 1; }
     }
     else if (!strcmp(cmd, "start")) {
         int inst, interval;
         if (need_arg(argc >= 4, "inst> <ms")) { rc = 2; goto out; }
         inst = atoi(argv[2]);
         interval = atoi(argv[3]);
-        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst debe ser 0 o 1.\n"); rc = 2; goto out; }
-        if (interval < 1000 || interval > 600000) { fprintf(stderr, "error: ms debe ser 1000-600000.\n"); rc = 2; goto out; }
+        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst must be 0 or 1.\n"); rc = 2; goto out; }
+        if (interval < 1000 || interval > 600000) { fprintf(stderr, "error: ms must be 1000-600000.\n"); rc = 2; goto out; }
         req[0] = 0x02; req[1] = (uint8_t)inst;
         req[2] = (uint8_t)(interval >> 8); req[3] = (uint8_t)interval;
         n = xfer(fd, req, 4, rsp, sizeof(rsp), 3000);
         if (n >= 2 && rsp[1] == 0)
             printf("start: ok (radio %d, interval=%d ms)\n", inst, interval);
-        else { fprintf(stderr, "start: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
+        else { fprintf(stderr, "start: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
     }
     else if (!strcmp(cmd, "stop")) {
         uint8_t p[1] = { 0x03 };
         n = xfer(fd, p, 1, rsp, sizeof(rsp), 3000);
         if (n >= 2 && rsp[1] == 0)
             printf("stop: ok\n");
-        else { fprintf(stderr, "stop: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
+        else { fprintf(stderr, "stop: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
     }
     else if (!strcmp(cmd, "status")) {
         uint8_t p[1] = { 0x04 };
@@ -424,7 +423,7 @@ int main(int argc, char **argv)
                              ((uint32_t)rsp[14] << 8) | rsp[15];
             printf("status: %s  inst=%d  interval=%d ms  seq=%u  tx_ok=%u  fails=%u\n",
                    running ? "RUNNING" : "STOPPED", inst, interval, seq, tx_ok, fails);
-        } else { fprintf(stderr, "status: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
+        } else { fprintf(stderr, "status: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
     }
     else if (!strcmp(cmd, "config")) {
         int inst, sf, cr, power;
@@ -436,10 +435,10 @@ int main(int argc, char **argv)
         bw    = (uint32_t)strtoul(argv[5], NULL, 10);
         cr    = atoi(argv[6]);
         power = atoi(argv[7]);
-        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst debe ser 0 o 1.\n"); rc = 2; goto out; }
-        if (freq < 150000000U || freq > 960000000U) { fprintf(stderr, "error: freq fuera de rango.\n"); rc = 2; goto out; }
+        if (inst < 0 || inst > 1) { fprintf(stderr, "error: inst must be 0 or 1.\n"); rc = 2; goto out; }
+        if (freq < 150000000U || freq > 960000000U) { fprintf(stderr, "error: freq out of range.\n"); rc = 2; goto out; }
         if (sf < 5 || sf > 12) { fprintf(stderr, "error: SF 5-12.\n"); rc = 2; goto out; }
-        if (power < -9 || power > 22) { fprintf(stderr, "error: potencia -9..22 dBm.\n"); rc = 2; goto out; }
+        if (power < -9 || power > 22) { fprintf(stderr, "error: power -9..22 dBm.\n"); rc = 2; goto out; }
         req[0] = 0x05; req[1] = (uint8_t)inst;
         req[2] = (uint8_t)(freq >> 24); req[3] = (uint8_t)(freq >> 16);
         req[4] = (uint8_t)(freq >> 8);  req[5] = (uint8_t)freq;
@@ -450,10 +449,10 @@ int main(int argc, char **argv)
         if (n >= 2 && rsp[1] == 0)
             printf("config: ok (radio=%d freq=%u sf=%d bw=%u cr=%d power=%d dBm)\n",
                    inst, freq, sf, bw, cr, power);
-        else { fprintf(stderr, "config: fallo (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
+        else { fprintf(stderr, "config: failed (n=%d err=0x%02x)\n", n, n >= 2 ? rsp[1] : 0xFF); rc = 1; }
     }
     else {
-        fprintf(stderr, "error: comando desconocido '%s'.\n", cmd);
+        fprintf(stderr, "error: unknown command '%s'.\n", cmd);
         rc = 2;
     }
 

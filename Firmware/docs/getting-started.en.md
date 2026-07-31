@@ -22,11 +22,11 @@ provided by ElectronicCats). You need both before building — see step 2.
 > **Before you build — two things this repo does not include:**
 > - **Toolchains** (ARM `arm-rockchip830-linux-uclibcgnueabihf` + RISC-V
 >   `xpack-riscv-none-embed-gcc-10.2.0`): download `toolchain.tar.gz` from
->   this repository's **[v6 Release](../../../releases/tag/v6)** and extract
+>   this repository's **[v6 Release](../../../../releases/tag/v6)** and extract
 >   it at the repo root (`tar -xzf toolchain.tar.gz -C .`) — it unpacks into
 >   `toolchain/`, preserving that folder name.
 > - **`rkbin`** (Rockchip's proprietary boot-stage binaries): download
->   `rkbin.tar.gz` from the same **[v6 Release](../../../releases/tag/v6)**
+>   `rkbin.tar.gz` from the same **[v6 Release](../../../../releases/tag/v6)**
 >   and extract it into `src/` (`tar -xzf rkbin.tar.gz -C src/`) — it
 >   unpacks into `src/rkbin/`.
 >
