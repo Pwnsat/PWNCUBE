@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Cubesat")(type "KiCad")(uri "${KIPRJMOD}/Cubesat.kicad_sym")(options "")(descr ""))
+  (lib (name "SX1262IMLTRT")(type "KiCad")(uri "/home/jorge/Descargas/SX1262IMLTRT/SX1262IMLTRT.kicad_sym")(options "")(descr ""))
+)

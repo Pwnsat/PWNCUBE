@@ -206,8 +206,8 @@ component:
 | Linux kernel (`src/kernel/`) | GPL-2.0 |
 | U-Boot (`src/u-boot/`) | GPL-2.0 |
 | Busybox (`src/busybox/`) | GPL-2.0 |
-| Toolchains (not included in this repo — see [Getting Started](docs/getting-started.en.md)) | GPL-3.0 / LGPL-2.1 |
-| `rkbin` (not included in this repo — see [Getting Started](docs/getting-started.en.md)) | Proprietary, Rockchip |
+| Toolchains (not in this repo's tree — see the [v6 Release](../../releases/tag/v6)) | GPL-3.0 / LGPL-2.1 |
+| `rkbin` (not in this repo's tree — see the [v6 Release](../../releases/tag/v6)) | Proprietary, Rockchip |
 
 Known limitation, documented rather than hidden: **the sensor telemetry
 frame's altitude field can overflow its 16-bit fixed-point encoding**

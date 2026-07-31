@@ -1,0 +1,228 @@
+(footprint "LQH5BPN"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "SMD POWER INDUCTOR\n\nhigh current")
+	(property "Reference" "L1"
+		(at -2.75 0 90)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "00bddf1f-2b85-4699-a8e4-6ce50e1612a0")
+		(effects
+			(font
+				(size 1.176528 1.176528)
+				(thickness 0.093472)
+			)
+			(justify left bottom)
+		)
+	)
+	(property "Value" "4.7uH"
+		(at -2.968 2.458 90)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "16207054-8f1f-4370-ad7c-1d1ac6953758")
+		(effects
+			(font
+				(size 1.176528 1.176528)
+				(thickness 0.093472)
+			)
+			(justify left bottom)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "67ae57fd-9125-44ee-8ff3-8e72af8bd45a")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Inductor, small symbol"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "edcb4458-9470-478b-a4d8-0e8b09c16e4e")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "JLCPCB" "C520334"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0e3b6fa5-f856-40ce-8054-320a38965190")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacter Number" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "cc2e3c64-4ef7-42e5-8bb1-1f3f27eac58b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "provedor" "LCSC"
+		(at 0 0 180)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6249114b-2813-44ad-bed3-0ac67a899875")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_line
+		(start -2.75 -2.55)
+		(end -2.75 2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "893e58ad-822b-43e8-99a7-f3cce9d87aa3")
+	)
+	(fp_line
+		(start -2.75 2.55)
+		(end -2.5 2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "9f1f3893-c0d9-40e9-a5db-c608fc0529c4")
+	)
+	(fp_line
+		(start -2.5 -2.55)
+		(end -2.75 -2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "618bf78c-ec24-4659-ac4e-26c941dc22be")
+	)
+	(fp_line
+		(start 2.5 2.55)
+		(end 2.75 2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "029fc877-ad63-4202-90bc-8f678ad39184")
+	)
+	(fp_line
+		(start 2.75 -2.55)
+		(end 2.5 -2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "b8a38d26-1f27-469c-a23d-bbe4f3ed9041")
+	)
+	(fp_line
+		(start 2.75 -2.55)
+		(end 2.75 2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a371c7e2-c89a-4e08-9b5e-d40bae2be1a1")
+	)
+	(fp_line
+		(start -2.75 2.55)
+		(end 2.75 2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "04fe30ee-a682-41a6-b397-5f5bc800c688")
+	)
+	(fp_line
+		(start 2.75 -2.55)
+		(end -2.75 -2.55)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "7b776bb3-7bd3-4b43-be13-d63a45038206")
+	)
+	(fp_arc
+		(start -1 2.5)
+		(mid -2.692582 0)
+		(end -1 -2.5)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "a3533cbd-2a8e-4e6b-ad65-255044b7c944")
+	)
+	(fp_arc
+		(start 1 -2.5)
+		(mid 2.692582 0)
+		(end 1 2.5)
+		(stroke
+			(width 0.2032)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "b139f56b-2aa1-42e6-84e7-f90f43eae84a")
+	)
+	(pad "1" smd rect
+		(at 0 1.859)
+		(size 4.0894 1.8288)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.1016)
+		(solder_paste_margin 0)
+		(thermal_bridge_angle 0)
+		(uuid "ab88db82-6c59-43e7-8336-882502097d4c")
+	)
+	(pad "2" smd rect
+		(at 0 -1.859)
+		(size 4.0894 1.8288)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.1016)
+		(solder_paste_margin 0)
+		(thermal_bridge_angle 0)
+		(uuid "b44802e5-7f05-43c5-9507-49c590ee70df")
+	)
+	(embedded_fonts no)
+	(model "${KICAD9_3DMODEL_DIR}/Inductor_SMD.3dshapes/L_APV_ANR5012.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 2.9)
+		)
+		(rotate
+			(xyz -0 -0 90)
+		)
+	)
+)

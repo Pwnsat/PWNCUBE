@@ -9,8 +9,11 @@ Full documentation, architecture diagrams, and step-by-step guides live in the *
 | Folder | Contents |
 |---|---|
 | [`Firmware/`](Firmware/) | The complete RV1106 SDK source: dual-core boot (Cortex-A7 Linux + RISC-V RT-Thread), CCSDS Space Packet Protocol stack, radio/sensor/GPS drivers, build scripts. Clone-and-build (see [Getting Started](../../wiki/Getting-Started)). |
-| [`Attacks/`](Attacks/) | 8 standalone, documented attack scripts (00–07) exploiting the vulnerabilities below — both over the board's USB debug console and over real RF (HackRF uplink / RTL-SDR downlink). No dependency on any other repository. |
+| [`Hardware/`](Hardware/) | KiCad schematics and PCB design files for the three physical boards (main/flight-computer, sensor, battery). |
 | [`Case/`](Case/) | 3D-printable enclosure (STL + slicer project files). |
+
+The 8 hardware-validated attack scripts (00–07, USB and real RF) live in a
+companion `Attacks/` repository, published separately.
 
 ## What PWNCUBE demonstrates
 
@@ -30,18 +33,23 @@ See the **[Attack Vectors](../../wiki/Attack-Vectors)** wiki page for the full w
 ```bash
 git clone <this-repo-url> PWNCUBE-FIRMWARE
 cd PWNCUBE-FIRMWARE/Firmware
-./build.sh deps      # install host build dependencies
+# extract toolchain.tar.gz + rkbin.tar.gz from the v6 Release first — see below
+./build.sh deps      # install host build dependencies (native Linux x86-64)
 ./build.sh            # produces output/images/update.img
 ```
 
-Flashing requires a Linux x86-64 host (the vendor `upgrade_tool` is not portable) with USB access to the board in maskrom mode — see **[Getting Started](../../wiki/Getting-Started)** for the full walkthrough, including the toolchain download step (excluded from this repo, see below).
+On macOS, Windows, or if you'd rather not install packages on the host
+directly, build inside Docker instead — see **[Getting Started](../../wiki/Getting-Started)**
+for the full walkthrough (both paths), including flashing, which always
+needs a real Linux x86-64 host or VM with USB passthrough regardless of how
+you built.
 
 ## Note on repository size
 
-This repository intentionally excludes two things present in the original SDK archive:
+This repository intentionally excludes two things present in the original SDK archive, both available as assets on the **[v6 Release](../../releases/tag/v6)**:
 
-- **`toolchain/`** (ARM + RISC-V cross-compilers, ~2.6GB) — third-party, freely redistributable, but too large for a source repo. Download instructions: **[Getting Started](../../wiki/Getting-Started)**.
-- **`src/rkbin/`** (Rockchip's proprietary boot-stage binaries) — third-party, closed-source, redistribution terms not confirmed. Download instructions: **[Getting Started](../../wiki/Getting-Started)**.
+- **`toolchain/`** (ARM + RISC-V cross-compilers, ~2.6GB) — third-party, freely redistributable, just too large for a source repo.
+- **`src/rkbin/`** (Rockchip's proprietary boot-stage binaries) — third-party, provided by ElectronicCats.
 
 Everything else — kernel, U-Boot, the RT-Thread MCU firmware, all PWNSAT-authored application code — is included as source.
 

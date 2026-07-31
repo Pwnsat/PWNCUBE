@@ -1,0 +1,288 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "575e3b02-8b1c-4d49-bab4-a07d6288bebf")
+	(paper "A4")
+	(lib_symbols)
+	(wire
+		(pts
+			(xy 134.62 45.72) (xy 165.1 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "312c5ba6-28f2-409c-9d5d-6dbd0ebb25ac")
+	)
+	(wire
+		(pts
+			(xy 134.62 48.26) (xy 165.1 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3f749c22-558e-487d-a3bc-09a396db42c6")
+	)
+	(wire
+		(pts
+			(xy 134.62 43.18) (xy 165.1 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7a2d3a3a-e454-4d71-9e07-dc716e60183e")
+	)
+	(wire
+		(pts
+			(xy 134.62 53.34) (xy 165.1 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7b029f14-f089-4994-92e8-d159f8d5f97e")
+	)
+	(wire
+		(pts
+			(xy 134.62 50.8) (xy 165.1 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9899c91e-2733-466b-98c4-f84819c49aae")
+	)
+	(wire
+		(pts
+			(xy 134.62 40.64) (xy 165.1 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e7a8e741-1133-4d7c-8f12-2d71634e90b1")
+	)
+	(sheet
+		(at 114.3 38.1)
+		(size 20.32 36.83)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "1451f59f-2b56-4011-b9cc-b834ac47899f")
+		(property "Sheetname" "USB"
+			(at 114.3 37.3884 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "USB.kicad_sch"
+			(at 114.3 75.5146 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "Battery" output
+			(at 134.62 43.18 0)
+			(uuid "2508f592-fc25-42f4-bc8f-e13280400706")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 134.62 48.26 0)
+			(uuid "bc828390-a46d-415d-b734-b1fcb3110f01")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "USB_DET" output
+			(at 134.62 45.72 0)
+			(uuid "a76d1348-0ac4-4956-b699-8419dc38d522")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VCC" output
+			(at 134.62 40.64 0)
+			(uuid "de70a47b-8299-46e2-85e1-ceb1baa9e6c0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "2_DP" bidirectional
+			(at 134.62 50.8 0)
+			(uuid "12bb1ff6-ce98-459c-b30d-2f1fc29f7a01")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "2_DN" bidirectional
+			(at 134.62 53.34 0)
+			(uuid "3e7be78d-503e-4a27-8045-0b9f216279b4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+3.3v" output
+			(at 134.62 55.88 0)
+			(uuid "17824da4-d054-4231-a3f0-6034b25c3a1d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Battery_Board"
+				(path "/575e3b02-8b1c-4d49-bab4-a07d6288bebf"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 165.1 31.75)
+		(size 26.67 53.34)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "90c0dba9-2fc3-4532-8e47-f1808f3ac4ad")
+		(property "Sheetname" "Batt_Connector"
+			(at 165.1 31.0384 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Batt_Connector.kicad_sch"
+			(at 165.1 85.6746 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "VCC" input
+			(at 165.1 40.64 180)
+			(uuid "eff96b84-3456-4658-8ecd-432e41f3a29a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "USB_DET" input
+			(at 165.1 45.72 180)
+			(uuid "15c5bbd9-dc7d-4010-b8d1-ff061dc2c71a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Battery" input
+			(at 165.1 43.18 180)
+			(uuid "addd7ae8-cc97-47c6-86cc-0f37c4f7cb5c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Enable" output
+			(at 165.1 48.26 180)
+			(uuid "27b6fb64-69b3-4fdd-9a91-450d31aca392")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "2_DN" bidirectional
+			(at 165.1 53.34 180)
+			(uuid "23475e54-b3db-4f5e-b792-d85e399e5691")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "2_DP" bidirectional
+			(at 165.1 50.8 180)
+			(uuid "e890c62c-c0a7-4df2-bc4a-da15800baeae")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "Battery_Board"
+				(path "/575e3b02-8b1c-4d49-bab4-a07d6288bebf"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
