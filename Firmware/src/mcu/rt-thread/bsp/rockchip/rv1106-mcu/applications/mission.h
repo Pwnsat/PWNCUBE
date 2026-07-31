@@ -105,9 +105,8 @@
  * true, matching this firmware's existing "errors are never checked"
  * stance elsewhere (command_service_telemetry_worker). SECURE_LINK and
  * USB_DEBUG stay permanently 0 -- PWNCUBE has neither an AES-ECB link nor
- * a USB-vs-radio command source distinction (see
- * 1-Blackhat-Final/CLAUDE.md's Etapa 6 section) -- honestly reporting
- * "off" rather than faking a subsystem that doesn't exist. */
+ * a USB-vs-radio command source distinction -- honestly reporting "off"
+ * rather than faking a subsystem that doesn't exist. */
 #define MISSION_FLAG_BME_OK          0x01
 #define MISSION_FLAG_ACC_OK          0x02
 #define MISSION_FLAG_GPS_UART_OK     0x04
