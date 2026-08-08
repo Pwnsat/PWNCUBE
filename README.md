@@ -53,6 +53,10 @@ This repository intentionally excludes two things present in the original SDK ar
 
 Everything else — kernel, U-Boot, the RT-Thread MCU firmware, all PWNSAT-authored application code — is included as source.
 
+## Disclaimer
+
+This project was created for educational purposes, to teach and learn aerospace cybersecurity. Neither PWNSAT nor Electronic Cats are responsible for how the knowledge, code, or tools hosted in this repository are used. Use only against hardware, firmware, or signal sources you own or are explicitly authorized to test.
+
 ## License
 
 Firmware source: see [`Firmware/README.md`](Firmware/README.md#license) for the per-component breakdown (this SDK integrates code under several different open-source licenses). Attack scripts and this repository's own documentation: MIT unless noted otherwise.
